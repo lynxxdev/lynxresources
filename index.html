@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lua Uploader</title>
+<style>
+body {
+  background: #0d0d0f;
+  color: white;
+  font-family: Arial;
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+.box {
+  width: 90%;
+  max-width: 500px;
+  background: #16161a;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #6a00ff;
+}
+.title {
+  font-size: 24px;
+  text-align: center;
+  color: #a56bff;
+  margin-bottom: 20px;
+}
+input {
+  width: 100%;
+  margin-top: 10px;
+}
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  background: #6a00ff;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+}
+textarea {
+  width: 100%;
+  height: 90px;
+  margin-top: 20px;
+  background: #111;
+  color: white;
+  border: 1px solid #6a00ff;
+  padding: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <div class="title">Lua Uploader</div>
+
+  <input type="file" id="fileInput" accept=".lua">
+  <button onclick="upload()">Enviar Script</button>
+
+  <textarea id="output" readonly placeholder="Seu loadstring aparecerá aqui..."></textarea>
+</div>
+
+<script>
+async function upload() {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Selecione um .lua");
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "x-file-name": file.name },
+    body: file
+  });
+
+  const json = await res.json();
+
+  const raw = location.origin + "/api/raw?file=" + file.name;
+  const load = `loadstring(game:HttpGet("${raw}"))()`;
+
+  document.getElementById("output").value = load;
+}
+</script>
+
+</body>
+</html>
